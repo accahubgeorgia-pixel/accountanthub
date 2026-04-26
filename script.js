@@ -13,52 +13,50 @@ async function loadSiteData() {
     const res = await fetch(API_URL + "?action=getData");
     const data = await res.json();
 
-    if (!data.success) {
-      throw new Error(data.message || "Data loading error");
-    }
+    if (!data.success) throw new Error(data.message);
 
     renderServices(data.services || []);
     renderSyllabus(data.syllabus || []);
     renderSelect(data.services || []);
 
   } catch (err) {
-    servicesGrid.innerHTML = `<div class="empty">მონაცემები ვერ ჩაიტვირთა. შეამოწმე Apps Script და Google Sheet.</div>`;
-    syllabusGrid.innerHTML = `<div class="empty">საკითხები ვერ ჩაიტვირთა.</div>`;
-    serviceSelect.innerHTML = `<option value="">მონაცემები ვერ ჩაიტვირთა</option>`;
+    servicesGrid.innerHTML = `<div class="empty">მომსახურებები ამ ეტაპზე არ არის დამატებული.</div>`;
+    syllabusGrid.innerHTML = `<div class="empty">სილაბუსი ამ ეტაპზე არ არის დამატებული.</div>`;
+    serviceSelect.innerHTML = `<option value="">მომსახურება ვერ ჩაიტვირთა</option>`;
   }
 }
 
 function renderServices(services) {
   if (!services.length) {
-    servicesGrid.innerHTML = `<div class="empty">მომსახურებები ჯერ არ არის დამატებული.</div>`;
+    servicesGrid.innerHTML = `<div class="empty">მომსახურებები ამ ეტაპზე არ არის დამატებული.</div>`;
     return;
   }
 
   servicesGrid.innerHTML = services.map((s, i) => `
-    <article class="service-card">
+    <article class="service-card liquid-card">
       <div class="service-number">${String(i + 1).padStart(2, "0")}</div>
       <h3>${safe(s.title)}</h3>
-      <p>${safe(s.description)}</p>
-      <div class="service-tags">
-        ${(s.details || []).map(d => d ? `<span>${safe(d)}</span>` : "").join("")}
-      </div>
+      ${s.description ? `<p class="preline">${safe(s.description)}</p>` : `<p>დეტალური აღწერა მალე დაემატება.</p>`}
+      <a href="#application" class="mini-btn">განაცხადის შევსება</a>
     </article>
   `).join("");
 }
 
 function renderSyllabus(rows) {
   if (!rows.length) {
-    syllabusGrid.innerHTML = `<div class="empty">საკითხები ჯერ არ არის დამატებული.</div>`;
+    syllabusGrid.innerHTML = `<div class="empty">სილაბუსი ამ ეტაპზე არ არის დამატებული.</div>`;
     return;
   }
 
   syllabusGrid.innerHTML = rows.map((r, i) => `
-    <div class="syllabus-card">
+    <div class="syllabus-card liquid-card">
       <b>${String(i + 1).padStart(2, "0")}</b>
       <div>
-        <h4>${safe(r.col1)}</h4>
-        <p>${safe(r.col2)}</p>
-        <small>${safe(r.col3)} ${safe(r.col4)} ${safe(r.col5)}</small>
+        ${r.col1 ? `<h4 class="preline">${safe(r.col1)}</h4>` : ""}
+        ${r.col2 ? `<p class="preline">${safe(r.col2)}</p>` : ""}
+        ${r.col3 ? `<p class="preline">${safe(r.col3)}</p>` : ""}
+        ${r.col4 ? `<p class="preline">${safe(r.col4)}</p>` : ""}
+        ${r.col5 ? `<p class="preline">${safe(r.col5)}</p>` : ""}
       </div>
     </div>
   `).join("");
@@ -69,7 +67,6 @@ function renderSelect(services) {
 
   services.forEach(s => {
     if (!s.title) return;
-
     const option = document.createElement("option");
     option.value = s.title;
     option.textContent = s.title;
@@ -102,9 +99,7 @@ form.addEventListener("submit", async function(e) {
 
     const data = await res.json();
 
-    if (!data.success) {
-      throw new Error(data.message || "Submit error");
-    }
+    if (!data.success) throw new Error();
 
     form.reset();
     formMessage.textContent = "განაცხადი წარმატებით გაიგზავნა.";
