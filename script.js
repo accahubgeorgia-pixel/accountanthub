@@ -5,6 +5,12 @@ const syllabusGrid = document.getElementById("syllabusGrid");
 const serviceSelect = document.getElementById("serviceSelect");
 const form = document.getElementById("applicationForm");
 const formMessage = document.getElementById("formMessage");
+const serviceDetails = document.getElementById("serviceDetails");
+const detailTitle = document.getElementById("detailTitle");
+const detailDescription = document.getElementById("detailDescription");
+
+let siteServices = [];
+let siteSyllabus = [];
 
 window.addEventListener("DOMContentLoaded", loadSiteData);
 
@@ -15,13 +21,14 @@ async function loadSiteData() {
 
     if (!data.success) throw new Error(data.message);
 
-    renderServices(data.services || []);
-    renderSyllabus(data.syllabus || []);
-    renderSelect(data.services || []);
+    siteServices = data.services || [];
+    siteSyllabus = data.syllabus || [];
+
+    renderServices(siteServices);
+    renderSelect(siteServices);
 
   } catch (err) {
     servicesGrid.innerHTML = `<div class="empty">მომსახურებები ამ ეტაპზე არ არის დამატებული.</div>`;
-    syllabusGrid.innerHTML = `<div class="empty">სილაბუსი ამ ეტაპზე არ არის დამატებული.</div>`;
     serviceSelect.innerHTML = `<option value="">მომსახურება ვერ ჩაიტვირთა</option>`;
   }
 }
@@ -37,9 +44,30 @@ function renderServices(services) {
       <div class="service-number">${String(i + 1).padStart(2, "0")}</div>
       <h3>${safe(s.title)}</h3>
       ${s.description ? `<p class="preline">${safe(s.description)}</p>` : `<p>დეტალური აღწერა მალე დაემატება.</p>`}
-      <a href="#application" class="mini-btn">განაცხადის შევსება</a>
+      <button class="mini-btn" type="button" onclick="openServiceDetails(${i})">დეტალურად ნახვა</button>
     </article>
   `).join("");
+}
+
+function openServiceDetails(index) {
+  const service = siteServices[index];
+
+  detailTitle.innerHTML = safe(service.title);
+
+  detailDescription.innerHTML = service.description
+    ? safe(service.description)
+    : "დეტალური აღწერა მალე დაემატება.";
+
+  renderSyllabus(siteSyllabus);
+
+  serviceDetails.style.display = "block";
+
+  setTimeout(() => {
+    serviceDetails.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, 100);
 }
 
 function renderSyllabus(rows) {
@@ -67,6 +95,7 @@ function renderSelect(services) {
 
   services.forEach(s => {
     if (!s.title) return;
+
     const option = document.createElement("option");
     option.value = s.title;
     option.textContent = s.title;
