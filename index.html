@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>AccountantHub | ბუღალტრული მომსახურება</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://kit.fontawesome.com/7b3b9e7c6f.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="#home">
+        <img src="photo1.png" alt="AccountantHub Logo">
+        <span>AccountantHub</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#services">მომსახურებები</a>
+        <a href="#syllabus">საკითხები</a>
+        <a href="#application">განაცხადი</a>
+        <a href="#contact">კონტაქტი</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section id="home" class="hero">
+      <div class="hero-bg"></div>
+
+      <div class="container hero-content">
+        <div class="hero-badge">ბუღალტრული მომსახურება ბიზნესისთვის</div>
+
+        <h1>
+          პროფესიონალური ბუღალტერია,
+          <span>სანდო ფინანსური მართვისთვის</span>
+        </h1>
+
+        <p>
+          AccountantHub გეხმარებათ ბუღალტრული პროცესების მოწესრიგებაში,
+          ფინანსური კონტროლის გაძლიერებაში და ბიზნესის მშვიდად მართვაში.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#application" class="btn primary">განაცხადის შევსება</a>
+          <a href="#services" class="btn secondary">მომსახურებების ნახვა</a>
+        </div>
+
+        <div class="contact-strip">
+          <a href="tel:+995505050254">
+            <i class="fa-solid fa-phone"></i>
+            +995 505 050 254
+          </a>
+
+          <a href="mailto:accahubgeorgia@gmail.com">
+            <i class="fa-solid fa-envelope"></i>
+            accahubgeorgia@gmail.com
+          </a>
+
+          <a href="https://www.facebook.com/share/17nJF73Aja/?mibextid=wwXIfr" target="_blank">
+            <i class="fa-brands fa-facebook-f"></i>
+            Facebook
+          </a>
+
+          <a href="https://www.tiktok.com/@accountant.hub?_r=1&_t=ZS-95rmZ5uBSHx" target="_blank">
+            <i class="fa-brands fa-tiktok"></i>
+            TikTok
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <div class="container">
+        <div class="section-head">
+          <span>რას გთავაზობთ</span>
+          <h2>ჩვენი მომსახურებები</h2>
+          <p>მონაცემები ავტომატურად მოდის Google Sheets-იდან.</p>
+        </div>
+
+        <div id="servicesGrid" class="services-grid">
+          <div class="loading">მომსახურებები იტვირთება...</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="syllabus" class="section dark-section">
+      <div class="container">
+        <div class="section-head">
+          <span>დეტალური საკითხები</span>
+          <h2>სილაბუსი / სამუშაო მიმართულებები</h2>
+          <p>A–E სვეტებში რაც გექნება Google Sheets-ში, აქ გამოჩნდება ავტომატურად.</p>
+        </div>
+
+        <div id="syllabusList" class="syllabus-list">
+          <div class="loading">საკითხები იტვირთება...</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="application" class="section form-section">
+      <div class="container form-wrap">
+
+        <div class="form-info">
+          <span>დაიწყე თანამშრომლობა</span>
+          <h2>შეავსე განაცხადი</h2>
+          <p>
+            აირჩიე სასურველი მომსახურება, დატოვე საკონტაქტო ინფორმაცია
+            და ჩვენი გუნდი დაგიკავშირდება.
+          </p>
+
+          <div class="mini-card">
+            <strong>სწრაფი კონტაქტი</strong>
+            <a href="tel:+995505050254">+995 505 050 254</a>
+            <a href="mailto:accahubgeorgia@gmail.com">accahubgeorgia@gmail.com</a>
+          </div>
+        </div>
+
+        <form id="applicationForm" class="application-form">
+          <label>
+            სახელი და გვარი
+            <input type="text" name="name" required placeholder="მაგ: გიორგი გიორგაძე">
+          </label>
+
+          <label>
+            ტელეფონი
+            <input type="tel" name="phone" required placeholder="+995">
+          </label>
+
+          <label>
+            ელ.ფოსტა
+            <input type="email" name="email" placeholder="example@gmail.com">
+          </label>
+
+          <label>
+            აირჩიეთ მომსახურება
+            <select name="service" id="serviceSelect" required>
+              <option value="">იტვირთება...</option>
+            </select>
+          </label>
+
+          <label>
+            დამატებითი კომენტარი
+            <textarea name="comment" rows="5" placeholder="დაგვიწერეთ რა მომსახურება გაინტერესებთ..."></textarea>
+          </label>
+
+          <button type="submit" class="btn primary full">განაცხადის გაგზავნა</button>
+
+          <div id="formMessage" class="form-message"></div>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="contact" class="footer">
+    <div class="container footer-content">
+      <div>
+        <img src="photo1.png" alt="AccountantHub">
+        <h3>AccountantHub</h3>
+        <p>Knowledge. Growth. Success.</p>
+      </div>
+
+      <div class="footer-links">
+        <a href="tel:+995505050254">+995 505 050 254</a>
+        <a href="mailto:accahubgeorgia@gmail.com">accahubgeorgia@gmail.com</a>
+        <a href="https://www.facebook.com/share/17nJF73Aja/?mibextid=wwXIfr" target="_blank">Facebook</a>
+        <a href="https://www.tiktok.com/@accountant.hub?_r=1&_t=ZS-95rmZ5uBSHx" target="_blank">TikTok</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
