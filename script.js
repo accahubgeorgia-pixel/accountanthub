@@ -1,121 +1,123 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbxas5Cf7_dKcZ7A-msOPidu9n7J3UqaTWkTp4k8oXOGOKo2tuJGAflSCwFwvEfrVhOmVQ/exec";
 
 const servicesGrid = document.getElementById("servicesGrid");
-const syllabusList = document.getElementById("syllabusList");
+const syllabusGrid = document.getElementById("syllabusGrid");
 const serviceSelect = document.getElementById("serviceSelect");
 const form = document.getElementById("applicationForm");
 const formMessage = document.getElementById("formMessage");
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadData();
-});
+window.addEventListener("DOMContentLoaded", loadSiteData);
 
-async function loadData() {
+async function loadSiteData() {
   try {
-    const response = await fetch(`${API_URL}?action=getData`);
-    const result = await response.json();
+    const res = await fetch(API_URL + "?action=getData");
+    const data = await res.json();
 
-    renderServices(result.services || []);
-    renderSyllabus(result.syllabus || []);
-    renderServiceOptions(result.services || []);
+    if (!data.success) {
+      throw new Error(data.message || "Data loading error");
+    }
 
-  } catch (error) {
-    servicesGrid.innerHTML = `<div class="loading">მონაცემების ჩატვირთვა ვერ მოხერხდა.</div>`;
-    syllabusList.innerHTML = `<div class="loading">საკითხების ჩატვირთვა ვერ მოხერხდა.</div>`;
-    serviceSelect.innerHTML = `<option value="">მომსახურებები ვერ ჩაიტვირთა</option>`;
+    renderServices(data.services || []);
+    renderSyllabus(data.syllabus || []);
+    renderSelect(data.services || []);
+
+  } catch (err) {
+    servicesGrid.innerHTML = `<div class="empty">მონაცემები ვერ ჩაიტვირთა. შეამოწმე Apps Script და Google Sheet.</div>`;
+    syllabusGrid.innerHTML = `<div class="empty">საკითხები ვერ ჩაიტვირთა.</div>`;
+    serviceSelect.innerHTML = `<option value="">მონაცემები ვერ ჩაიტვირთა</option>`;
   }
 }
 
 function renderServices(services) {
   if (!services.length) {
-    servicesGrid.innerHTML = `<div class="loading">მომსახურებები ჯერ არ არის დამატებული.</div>`;
+    servicesGrid.innerHTML = `<div class="empty">მომსახურებები ჯერ არ არის დამატებული.</div>`;
     return;
   }
 
-  servicesGrid.innerHTML = services.map((item) => `
-    <div class="service-card">
-      <div class="service-icon">
-        <i class="fa-solid fa-chart-line"></i>
+  servicesGrid.innerHTML = services.map((s, i) => `
+    <article class="service-card">
+      <div class="service-number">${String(i + 1).padStart(2, "0")}</div>
+      <h3>${safe(s.title)}</h3>
+      <p>${safe(s.description)}</p>
+      <div class="service-tags">
+        ${(s.details || []).map(d => d ? `<span>${safe(d)}</span>` : "").join("")}
       </div>
-
-      <h3>${escapeHTML(item.title)}</h3>
-      <p>${escapeHTML(item.description)}</p>
-
-      <div class="service-details">
-        ${item.details.map(detail => detail ? `<span>• ${escapeHTML(detail)}</span>` : "").join("")}
-      </div>
-    </div>
+    </article>
   `).join("");
 }
 
 function renderSyllabus(rows) {
   if (!rows.length) {
-    syllabusList.innerHTML = `<div class="loading">სილაბუსის საკითხები ჯერ არ არის დამატებული.</div>`;
+    syllabusGrid.innerHTML = `<div class="empty">საკითხები ჯერ არ არის დამატებული.</div>`;
     return;
   }
 
-  syllabusList.innerHTML = rows.map(row => `
-    <div class="syllabus-row">
-      <span>${escapeHTML(row.col1)}</span>
-      <span>${escapeHTML(row.col2)}</span>
-      <span>${escapeHTML(row.col3)}</span>
-      <span>${escapeHTML(row.col4)}</span>
-      <span>${escapeHTML(row.col5)}</span>
+  syllabusGrid.innerHTML = rows.map((r, i) => `
+    <div class="syllabus-card">
+      <b>${String(i + 1).padStart(2, "0")}</b>
+      <div>
+        <h4>${safe(r.col1)}</h4>
+        <p>${safe(r.col2)}</p>
+        <small>${safe(r.col3)} ${safe(r.col4)} ${safe(r.col5)}</small>
+      </div>
     </div>
   `).join("");
 }
 
-function renderServiceOptions(services) {
+function renderSelect(services) {
   serviceSelect.innerHTML = `<option value="">აირჩიეთ მომსახურება</option>`;
 
-  services.forEach(service => {
+  services.forEach(s => {
+    if (!s.title) return;
+
     const option = document.createElement("option");
-    option.value = service.title;
-    option.textContent = service.title;
+    option.value = s.title;
+    option.textContent = s.title;
     serviceSelect.appendChild(option);
   });
 }
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async function(e) {
   e.preventDefault();
 
   formMessage.textContent = "იგზავნება...";
   formMessage.className = "form-message";
 
-  const formData = new FormData(form);
-
-  const data = {
-    name: formData.get("name"),
-    phone: formData.get("phone"),
-    email: formData.get("email"),
-    service: formData.get("service"),
-    comment: formData.get("comment")
+  const payload = {
+    name: form.name.value.trim(),
+    phone: form.phone.value.trim(),
+    email: form.email.value.trim(),
+    service: form.service.value,
+    comment: form.comment.value.trim()
   };
 
   try {
-    const response = await fetch(API_URL, {
+    const body = new FormData();
+    body.append("payload", JSON.stringify(payload));
+
+    const res = await fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify(data)
+      body: body
     });
 
-    const result = await response.json();
+    const data = await res.json();
 
-    if (result.success) {
-      form.reset();
-      formMessage.textContent = "განაცხადი წარმატებით გაიგზავნა.";
-      formMessage.className = "form-message success";
-    } else {
-      throw new Error("Submit failed");
+    if (!data.success) {
+      throw new Error(data.message || "Submit error");
     }
 
-  } catch (error) {
-    formMessage.textContent = "დაფიქსირდა შეცდომა. სცადეთ თავიდან.";
+    form.reset();
+    formMessage.textContent = "განაცხადი წარმატებით გაიგზავნა.";
+    formMessage.className = "form-message success";
+
+  } catch (err) {
+    formMessage.textContent = "შეცდომა დაფიქსირდა. სცადეთ თავიდან.";
     formMessage.className = "form-message error";
   }
 });
 
-function escapeHTML(value) {
-  return String(value || "")
+function safe(v) {
+  return String(v || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
