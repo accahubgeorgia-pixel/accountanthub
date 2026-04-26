@@ -345,6 +345,7 @@ nav a:hover {
   color: #f1d79b;
   font-weight: 800;
   transition: .25s;
+  cursor: pointer;
 }
 
 .mini-btn:hover {
