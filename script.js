@@ -41,16 +41,18 @@ function renderServices(services) {
 
   servicesGrid.innerHTML = services.map((s, i) => `
     <article class="service-card liquid-card">
-      <div class="service-number">${String(i + 1).padStart(2, "0")}</div>
+      <div class="service-number">${String(s.id).padStart(2, "0")}</div>
       <h3>${safe(s.title)}</h3>
       ${s.description ? `<p class="preline">${safe(s.description)}</p>` : `<p>დეტალური აღწერა მალე დაემატება.</p>`}
-      <button class="mini-btn" type="button" onclick="openServiceDetails(${i})">დეტალურად ნახვა</button>
+      <button class="mini-btn" type="button" onclick="openServiceDetails(${s.id})">განაცხადის შევსება</button>
     </article>
   `).join("");
 }
 
-function openServiceDetails(index) {
-  const service = siteServices[index];
+function openServiceDetails(serviceId) {
+  const service = siteServices.find(item => String(item.id) === String(serviceId));
+
+  if (!service) return;
 
   detailTitle.innerHTML = safe(service.title);
 
@@ -58,7 +60,11 @@ function openServiceDetails(index) {
     ? safe(service.description)
     : "დეტალური აღწერა მალე დაემატება.";
 
-  renderSyllabus(siteSyllabus);
+  const filteredSyllabus = siteSyllabus.filter(item => {
+    return String(item.serviceId).trim() === String(serviceId).trim();
+  });
+
+  renderSyllabus(filteredSyllabus);
 
   serviceDetails.style.display = "block";
 
@@ -72,7 +78,7 @@ function openServiceDetails(index) {
 
 function renderSyllabus(rows) {
   if (!rows.length) {
-    syllabusGrid.innerHTML = `<div class="empty">სილაბუსი ამ ეტაპზე არ არის დამატებული.</div>`;
+    syllabusGrid.innerHTML = `<div class="empty">ამ მომსახურებისთვის სილაბუსი ჯერ არ არის დამატებული.</div>`;
     return;
   }
 
