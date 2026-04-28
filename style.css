@@ -489,6 +489,14 @@ nav a:hover {
   background: rgba(255,255,255,.07);
 }
 
+.service-page-hero {
+  min-height: 86vh;
+}
+
+.center-buttons {
+  justify-content: center;
+}
+
 @media (max-width: 950px) {
   .nav {
     flex-direction: column;
