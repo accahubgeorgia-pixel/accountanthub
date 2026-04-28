@@ -1,29 +1,40 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbxas5Cf7_dKcZ7A-msOPidu9n7J3UqaTWkTp4k8oXOGOKo2tuJGAflSCwFwvEfrVhOmVQ/exec";
 
+const CACHE_KEY = "accountanthub_site_data";
+const CACHE_TIME_KEY = "accountanthub_site_data_time";
+const LOCAL_CACHE_MINUTES = 10;
+
 const servicesGrid = document.getElementById("servicesGrid");
 const serviceSelect = document.getElementById("serviceSelect");
 const form = document.getElementById("applicationForm");
 const formMessage = document.getElementById("formMessage");
 
-let siteServices = [];
-
 window.addEventListener("DOMContentLoaded", loadSiteData);
 
 async function loadSiteData() {
+  const cachedData = getLocalCache();
+
+  if (cachedData) {
+    renderServices(cachedData.services || []);
+    renderSelect(cachedData.services || []);
+  }
+
   try {
-    const res = await fetch(API_URL + "?action=getData");
+    const res = await fetch(API_URL + "?action=getData&v=" + Date.now());
     const data = await res.json();
 
     if (!data.success) throw new Error(data.message);
 
-    siteServices = data.services || [];
+    setLocalCache(data);
 
-    renderServices(siteServices);
-    renderSelect(siteServices);
+    renderServices(data.services || []);
+    renderSelect(data.services || []);
 
   } catch (err) {
-    servicesGrid.innerHTML = `<div class="empty">მომსახურებები ამ ეტაპზე არ არის დამატებული.</div>`;
-    serviceSelect.innerHTML = `<option value="">მომსახურება ვერ ჩაიტვირთა</option>`;
+    if (!cachedData) {
+      servicesGrid.innerHTML = `<div class="empty">მომსახურებები ამ ეტაპზე არ არის დამატებული.</div>`;
+      serviceSelect.innerHTML = `<option value="">მომსახურება ვერ ჩაიტვირთა</option>`;
+    }
   }
 }
 
@@ -92,6 +103,33 @@ form.addEventListener("submit", async function(e) {
     formMessage.className = "form-message error";
   }
 });
+
+function getLocalCache() {
+  try {
+    const saved = localStorage.getItem(CACHE_KEY);
+    const savedTime = localStorage.getItem(CACHE_TIME_KEY);
+
+    if (!saved || !savedTime) return null;
+
+    const ageMinutes = (Date.now() - Number(savedTime)) / 1000 / 60;
+
+    if (ageMinutes > LOCAL_CACHE_MINUTES) {
+      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(CACHE_TIME_KEY);
+      return null;
+    }
+
+    return JSON.parse(saved);
+
+  } catch (err) {
+    return null;
+  }
+}
+
+function setLocalCache(data) {
+  localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+  localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
+}
 
 function safe(v) {
   return String(v || "")
